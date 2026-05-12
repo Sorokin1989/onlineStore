@@ -1,4 +1,4 @@
-package com.example.onlinestore;
+package com.example.onlineStore;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
