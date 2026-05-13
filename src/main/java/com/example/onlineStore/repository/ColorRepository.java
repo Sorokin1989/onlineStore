@@ -1,15 +1,15 @@
 package com.example.onlineStore.repository;
 
-import com.example.onlineStore.entity.Category;
+import com.example.onlineStore.entity.Color;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> {
-    List<Category> findByParentIsNull();
+public interface ColorRepository extends JpaRepository<Color, Long> {
 
-    Optional<Category> findBySlug(String slug);
+    Optional<Color> findByName(String name);
+
+    List<Color> findByActiveTrueOrderByNameAsc();
 }
