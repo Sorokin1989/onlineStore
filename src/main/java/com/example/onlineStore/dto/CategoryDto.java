@@ -8,10 +8,12 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class CategoryDto {
 
     private Long id;
     private String name;
+    private String slug;           // ← добавить
     private String description;
     private String imagePath;
     private Integer sortOrder;
@@ -25,11 +27,10 @@ public class CategoryDto {
     // Статистика (для админки)
     private Long productsCount;
 
-    // Конструктор для базовой информации (без детей)
-    public CategoryDto(Long id, String name,  String imagePath) {
+    // Конструктор для базовой информации
+    public CategoryDto(Long id, String name, String imagePath) {
         this.id = id;
         this.name = name;
-
         this.imagePath = imagePath;
     }
 
@@ -37,5 +38,4 @@ public class CategoryDto {
     public boolean hasChildren() {
         return children != null && !children.isEmpty();
     }
-
 }
