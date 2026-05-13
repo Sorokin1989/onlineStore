@@ -1,5 +1,6 @@
 package com.example.onlineStore.entity;
 
+import com.example.onlineStore.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,13 +22,12 @@ public class Order {
     private Long id;
 
     @Column(name = "order_number", nullable = false, unique = true)
-    private String orderNumber;  // уникальный номер заказа
+    private String orderNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Данные покупателя
     @Column(nullable = false)
     private String fullName;
 
@@ -41,22 +41,21 @@ public class Order {
 
     private String comment;
 
-    // Финансовая информация
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
     @Column(precision = 10, scale = 2)
     private BigDecimal deliveryCost = BigDecimal.ZERO;
 
-    // Статусы: NEW, PAID, PROCESSING, DELIVERED, CANCELLED
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status = "NEW";
+    private OrderStatus status = OrderStatus.NEW;
 
     @Column(nullable = false)
-    private String paymentMethod;  // CARD, CASH, ONLINE
+    private String paymentMethod;
 
     @Column(name = "payment_id")
-    private String paymentId;  // ID платежа в платёжной системе
+    private String paymentId;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -64,9 +63,21 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
-    // Вспомогательные методы
     public void addItem(OrderItem item) {
         items.add(item);
         item.setOrder(this);
+    }
+
+    // Вспомогательные методы
+    public boolean isPaid() {
+        return status == OrderStatus.PAID;
+    }
+
+    public boolean isNew() {
+        return status == OrderStatus.NEW;
+    }
+
+    public boolean isCancelled() {
+        return status == OrderStatus.CANCELLED;
     }
 }
