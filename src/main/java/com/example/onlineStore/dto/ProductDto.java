@@ -19,8 +19,6 @@ public class ProductDto {
     private String description;
     private BigDecimal price;
     private BigDecimal oldPrice;
-    private String imagePath;
-    private List<String> additionalImages = new ArrayList<>();
     private Boolean inStock;
     private Integer quantity;
 
@@ -28,6 +26,33 @@ public class ProductDto {
     private Long categoryId;
     private String categoryName;
     private String categorySlug;
+
+    // Бренд
+    private Long brandId;
+    private String brandName;
+    private String brandLogo;
+
+    // Гарантия
+    private Long warrantyId;
+    private String warrantyName;
+    private Integer warrantyMonths;
+
+    // Совместимость
+    private List<CompatibilityDto> compatibilities = new ArrayList<>();
+
+    // Цвета
+    private List<ColorDto> colors = new ArrayList<>();
+
+    // Теги
+    private List<TagDto> tags = new ArrayList<>();
+
+    // Характеристики
+    private List<ProductSpecificationDto> specifications = new ArrayList<>();
+
+    // Изображения
+    private List<String> images = new ArrayList<>();
+    private String mainImage;
+    private String imagePath;
 
     // Метаданные
     private LocalDateTime createdAt;
@@ -50,9 +75,5 @@ public class ProductDto {
 
     public String getUrl() {
         return "/product/" + slug;
-    }
-
-    public String getFormattedPrice() {
-        return String.format("%,.2f ₽", price).replace(",", " ");
     }
 }

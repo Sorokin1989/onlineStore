@@ -16,6 +16,7 @@ public class CategoryMapper {
         CategoryDto dto = new CategoryDto();
         dto.setId(category.getId());
         dto.setName(category.getName());
+        dto.setSlug(category.getSlug());           // ← если есть slug
         dto.setDescription(category.getDescription());
         dto.setImagePath(category.getImagePath());
         dto.setSortOrder(category.getSortOrder());
@@ -36,7 +37,6 @@ public class CategoryMapper {
                 .collect(Collectors.toList());
     }
 
-    // С преобразованием детей (иерархия)
     public CategoryDto toDtoWithChildren(Category category) {
         CategoryDto dto = toDto(category);
         if (category.getChildren() != null && !category.getChildren().isEmpty()) {
@@ -45,16 +45,27 @@ public class CategoryMapper {
         return dto;
     }
 
-    // Для обратного преобразования (создание/обновление)
+    // Для создания (без ID)
     public Category toEntity(CategoryDto dto, Category parent) {
         Category category = new Category();
-        category.setId(dto.getId());
         category.setName(dto.getName());
+        category.setSlug(dto.getSlug());
         category.setDescription(dto.getDescription());
         category.setImagePath(dto.getImagePath());
         category.setSortOrder(dto.getSortOrder() != null ? dto.getSortOrder() : 0);
         category.setActive(dto.getActive() != null ? dto.getActive() : true);
         category.setParent(parent);
         return category;
+    }
+
+    // Для обновления (существующая сущность)
+    public void updateEntity(CategoryDto dto, Category entity, Category parent) {
+        if (dto.getName() != null) entity.setName(dto.getName());
+        if (dto.getSlug() != null) entity.setSlug(dto.getSlug());
+        if (dto.getDescription() != null) entity.setDescription(dto.getDescription());
+        if (dto.getImagePath() != null) entity.setImagePath(dto.getImagePath());
+        if (dto.getSortOrder() != null) entity.setSortOrder(dto.getSortOrder());
+        if (dto.getActive() != null) entity.setActive(dto.getActive());
+        if (parent != null) entity.setParent(parent);
     }
 }
