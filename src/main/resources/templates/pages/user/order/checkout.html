@@ -1,0 +1,47 @@
+<th:block th:fragment="content">
+    <h1>Оформление заказа</h1>
+    <div class="row">
+        <div class="col-md-7">
+            <form th:action="@{/order/create}" method="post" th:object="${orderRequest}">
+                <div class="mb-3">
+                    <label>Ваше имя</label>
+                    <input type="text" class="form-control" th:field="*{fullName}" required>
+                </div>
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input type="email" class="form-control" th:field="*{email}" required>
+                </div>
+                <div class="mb-3">
+                    <label>Телефон</label>
+                    <input type="tel" class="form-control" th:field="*{phone}" required>
+                </div>
+                <div class="mb-3">
+                    <label>Адрес доставки</label>
+                    <textarea class="form-control" th:field="*{address}" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label>Комментарий</label>
+                    <textarea class="form-control" th:field="*{comment}" rows="2"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label>Способ оплаты</label>
+                    <select class="form-select" th:field="*{paymentMethod}">
+                        <option value="CARD">Банковская карта онлайн</option>
+                        <option value="CASH">Наличными при получении</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Подтвердить заказ</button>
+                <a th:href="@{/cart}" class="btn btn-secondary">Вернуться в корзину</a>
+            </form>
+        </div>
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">Ваш заказ</div>
+                <div class="card-body">
+                    <p>Товаров: <span th:text="${cartItemsCount}"></span></p>
+                    <h5>Итого: <span th:text="${total}"></span></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>

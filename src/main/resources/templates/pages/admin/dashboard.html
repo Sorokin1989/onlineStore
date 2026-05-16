@@ -1,0 +1,69 @@
+<th:block th:fragment="content">
+    <div class="container-fluid">
+        <h1 class="mb-4">Панель управления</h1>
+
+        <!-- Статистика -->
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">Товары</h5>
+                        <h2 class="card-text" th:text="${totalProducts}">0</h2>
+                        <a th:href="@{/admin/products}" class="text-white">Управление →</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">Заказы</h5>
+                        <h2 class="card-text" th:text="${totalOrders}">0</h2>
+                        <a th:href="@{/admin/orders}" class="text-white">Управление →</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title">Пользователи</h5>
+                        <h2 class="card-text" th:text="${totalUsers}">0</h2>
+                        <a th:href="@{/admin/users}" class="text-white">Управление →</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">Отзывы</h5>
+                        <h2 class="card-text" th:text="${pendingReviews}">0</h2>
+                        <a th:href="@{/admin/reviews}" class="text-white">На модерацию →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Быстрые действия -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Новые заказы</div>
+                    <div class="card-body">
+                        <p>Новых заказов: <strong th:text="${newOrders}">0</strong></p>
+                        <a th:href="@{/admin/orders}" class="btn btn-sm btn-primary">Перейти к заказам</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Быстрые действия</div>
+                    <div class="card-body">
+                        <a th:href="@{/admin/products/create}" class="btn btn-sm btn-success me-2">+ Добавить товар</a>
+                        <a th:href="@{/admin/categories/create}" class="btn btn-sm btn-info me-2">+ Добавить категорию</a>
+                        <a th:href="@{/admin/brands/create}" class="btn btn-sm btn-info me-2">+ Добавить бренд</a>
+                        <a th:href="@{/admin/promocodes/create}" class="btn btn-sm btn-warning">+ Добавить промокод</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>

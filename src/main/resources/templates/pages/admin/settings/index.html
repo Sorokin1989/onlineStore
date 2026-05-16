@@ -1,0 +1,60 @@
+<th:block th:fragment="content">
+    <div class="container-fluid">
+        <h1 class="mb-4">Настройки магазина</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/admin/settings/update}" method="post" th:object="${settings}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Название сайта</label>
+                                <input type="text" class="form-control" th:field="*{siteName}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email магазина</label>
+                                <input type="email" class="form-control" th:field="*{siteEmail}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Телефон</label>
+                                <input type="text" class="form-control" th:field="*{sitePhone}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Адрес</label>
+                                <textarea class="form-control" rows="2" th:field="*{siteAddress}"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Режим работы</label>
+                                <input type="text" class="form-control" th:field="*{workingHours}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">VK URL</label>
+                                <input type="url" class="form-control" th:field="*{vkUrl}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Telegram URL</label>
+                                <input type="url" class="form-control" th:field="*{telegramUrl}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">WhatsApp URL</label>
+                                <input type="url" class="form-control" th:field="*{whatsappUrl}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Meta описание</label>
+                                <textarea class="form-control" rows="2" th:field="*{metaDescription}"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Meta ключевые слова</label>
+                                <input type="text" class="form-control" th:field="*{metaKeywords}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Сохранить настройки</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>

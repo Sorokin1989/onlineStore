@@ -1,0 +1,76 @@
+<th:block th:fragment="content">
+    <div class="container">
+        <div class="mb-4">
+            <a th:href="@{/tag}" class="btn btn-outline-secondary btn-sm mb-3">← Назад к подборкам</a>
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i th:if="${tag.name == 'хит'}" class="fas fa-fire fa-3x text-danger"></i>
+                    <i th:if="${tag.name == 'новинка'}" class="fas fa-star fa-3x text-warning"></i>
+                    <i th:if="${tag.name == 'распродажа'}" class="fas fa-tags fa-3x text-success"></i>
+                    <i th:if="${tag.name == 'популярный'}" class="fas fa-chart-line fa-3x text-primary"></i>
+                    <i th:unless="${tag.name == 'хит' or tag.name == 'новинка' or tag.name == 'распродажа' or tag.name == 'популярный'}"
+                       class="fas fa-tag fa-3x text-secondary"></i>
+                </div>
+                <div>
+                    <h1 class="mb-1" th:text="${tag.name}">Название тега</h1>
+                    <p class="text-muted" th:if="${tag.name == 'хит'}">Самые популярные товары среди наших покупателей</p>
+                    <p class="text-muted" th:if="${tag.name == 'новинка'}">Новинки, которые только появились в магазине</p>
+                    <p class="text-muted" th:if="${tag.name == 'распродажа'}"}>Товары с выгодными скидками</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сортировка -->
+        <div class="row mb-4" th:if="${products.totalElements > 0}">
+            <div class="col-md-3 ms-auto">
+                <select class="form-select" onchange="window.location.href=this.value">
+                    <option th:selected="${filter.sortBy == null}" value="?sortBy=newest">По новизне</option>
+                    <option th:selected="${filter.sortBy == 'price_asc'}" value="?sortBy=price_asc">Цена по возрастанию</option>
+                    <option th:selected="${filter.sortBy == 'price_desc'}" value="?sortBy=price_desc">Цена по убыванию</option>
+                    <option th:selected="${filter.sortBy == 'name_asc'}" value="?sortBy=name_asc">Название (А-Я)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Товары -->
+        <div class="row">
+            <div class="col-md-3 mb-4" th:each="product : ${products.content}">
+                <div class="card h-100 position-relative">
+                    <div th:if="${tag.name == 'распродажа' and product.discountPercent > 0}"
+                         class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 m-2 rounded">
+                        -<span th:text="${product.discountPercent}"></span>%
+                    </div>
+                    <img th:src="${product.mainImage ?: '/images/no-image.jpg'}"
+                         class="card-img-top" style="height: 180px; object-fit: cover;">
+                    <div class="card-body">
+                        <h6 class="card-title" th:text="${product.name}">Название</h6>
+                        <p class="text-danger fw-bold" th:text="${product.formattedPrice}">0 ₽</p>
+                        <a th:href="@{|/product/${product.slug}|}" class="btn btn-sm btn-primary w-100">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Пагинация -->
+        <nav th:if="${products.totalPages > 1}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!products.first} ? '' : 'disabled'">
+                    <a class="page-link" th:href="@{__${#request.requestURI}__(page=${products.number - 1}, sortBy=${filter.sortBy})}">«</a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}"
+                    class="page-item" th:classappend="${i == products.number} ? 'active' : ''">
+                    <a class="page-link" th:href="@{__${#request.requestURI}__(page=${i}, sortBy=${filter.sortBy})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${!products.last} ? '' : 'disabled'">
+                    <a class="page-link" th:href="@{__${#request.requestURI}__(page=${products.number + 1}, sortBy=${filter.sortBy})}">»</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div th:if="${products.totalElements == 0}" class="text-center py-5">
+            <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+            <p class="lead">Нет товаров в этой подборке</p>
+            <a th:href="@{/tag}" class="btn btn-primary">Выбрать другую подборку</a>
+        </div>
+    </div>
+</th:block>

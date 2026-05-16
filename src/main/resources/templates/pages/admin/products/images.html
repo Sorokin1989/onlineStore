@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="content">
+    <div class="container-fluid">
+        <!-- Кнопка назад -->
+        <div class="mb-3">
+            <a th:href="@{/admin/products}" class="btn btn-secondary">
+                ← Назад к товарам
+            </a>
+        </div>
+
+        <h1 class="mb-4">Управление изображениями</h1>
+
+        <!-- Информация о товаре -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Товар: <span th:text="${product.name}"></span></h5>
+            </div>
+            <div class="card-body">
+                <p><strong>ID:</strong> <span th:text="${product.id}"></span></p>
+                <p><strong>Бренд:</strong> <span th:text="${product.brand?.name}">-</span></p>
+                <p><strong>Категория:</strong> <span th:text="${product.category?.name}">-</span></p>
+                <p><strong>Цена:</strong> <span th:text="${product.price}">0</span> ₽</p>
+            </div>
+        </div>
+
+        <!-- Форма загрузки изображения -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Добавить новое изображение</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/admin/products/images/{productId}/upload(productId=${product.id})}"
+                      method="post"
+                      enctype="multipart/form-data">
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Выберите изображение</label>
+                                <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-success w-100">
+                                📤 Загрузить
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Галерея изображений -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Галерея изображений</h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${images.isEmpty()}" class="alert alert-warning">
+                    Нет загруженных изображений
+                </div>
+                <div th:if="${!images.isEmpty()}" class="row">
+                    <div th:each="image : ${images}" class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <img th:src="@{/uploads/__${image.filePath}__}"
+                                     alt="Изображение"
+                                     class="img-fluid mb-2"
+                                     style="max-height: 150px; object-fit: cover;">
+                                <p class="small text-muted" th:text="${image.fileName}"></p>
+                                <form th:action="@{/admin/products/images/{imageId}/delete(imageId=${image.id})}"
+                                      method="post"
+                                      style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Удалить это изображение?')">
+                                        🗑️ Удалить
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Подсказки -->
+        <div class="alert alert-info mt-3">
+            <strong>💡 Подсказка:</strong>
+            <ul class="mb-0">
+                <li>Поддерживаемые форматы: JPG, PNG, GIF, WEBP</li>
+                <li>Рекомендуемый размер: до 5 МБ</li>
+                <li>Оптимальное разрешение: 800x800 пикселей</li>
+            </ul>
+        </div>
+    </div>
+</th:block>
+</html>

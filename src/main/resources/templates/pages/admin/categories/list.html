@@ -1,0 +1,82 @@
+<th:block th:fragment="content">
+    <div class="container-fluid">
+        <!-- Кнопка назад -->
+        <div class="mb-3">
+            <a th:href="@{/admin}" class="btn btn-secondary">
+                ← Назад в админ-панель
+            </a>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Категории</h1>
+            <a th:href="@{/admin/categories/create}" class="btn btn-primary">
+                + Создать категорию
+            </a>
+        </div>
+
+        <!-- Сообщения -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Изображение</th>
+                            <th>Название</th>
+                            <th>Slug</th>
+                            <th>Родитель</th>
+                            <th>Порядок</th>
+                            <th>Активна</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="cat : ${categories}">
+                            <td th:text="${cat.id}">1</td>
+                            <td>
+                                <img th:if="${cat.imagePath != null}"
+                                     th:src="@{/uploads/__${cat.imagePath}__}"
+                                     style="height: 40px; width: 40px; object-fit: cover;"
+                                     class="img-thumbnail">
+                                <span th:if="${cat.imagePath == null}">—</span>
+                            </td>
+                            <td th:text="${cat.name}">Категория</td>
+                            <td th:text="${cat.slug}">slug</td>
+                            <td th:text="${cat.parentName}">—</td>
+                            <td th:text="${cat.sortOrder}">0</td>
+                            <td>
+                                <span th:if="${cat.active == true}" class="badge bg-success">Активна</span>
+                                <span th:if="${cat.active == false}" class="badge bg-secondary">Неактивна</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/admin/categories/edit/{id}(id=${cat.id})}"
+                                   class="btn btn-sm btn-info">Редактировать</a>
+                                <form th:action="@{/admin/categories/delete/{id}(id=${cat.id})}"
+                                      method="post" style="display: inline;"
+                                      onsubmit="return confirm('Удалить категорию?')">
+                                    <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${categories != null and categories.isEmpty()}">
+                            <td colspan="8" class="text-center text-muted">
+                                Нет категорий. <a th:href="@{/admin/categories/create}">Создать первую</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>

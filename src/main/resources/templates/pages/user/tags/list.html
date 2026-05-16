@@ -1,0 +1,36 @@
+<th:block th:fragment="content">
+    <div class="container">
+        <h1 class="mb-4">Подборки товаров</h1>
+        <p class="lead mb-4">Выберите интересующую вас подборку</p>
+
+        <div class="row">
+            <div class="col-md-3 mb-4" th:each="tag : ${tags}">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i th:if="${tag.name == 'хит'}" class="fas fa-fire fa-3x text-danger"></i>
+                            <i th:if="${tag.name == 'новинка'}" class="fas fa-star fa-3x text-warning"></i>
+                            <i th:if="${tag.name == 'распродажа'}" class="fas fa-tags fa-3x text-success"></i>
+                            <i th:if="${tag.name == 'популярный'}" class="fas fa-chart-line fa-3x text-primary"></i>
+                            <i th:if="${tag.name == 'рекомендуем'}" class="fas fa-thumbs-up fa-3x text-info"></i>
+                            <i th:unless="${tag.name == 'хит' or tag.name == 'новинка' or tag.name == 'распродажа' or tag.name == 'популярный' or tag.name == 'рекомендуем'}"
+                               class="fas fa-tag fa-3x text-secondary"></i>
+                        </div>
+                        <h5 class="card-title" th:text="${tag.name}">Название тега</h5>
+                        <p class="card-text text-muted small" th:if="${tag.name == 'хит'}">Самые популярные товары</p>
+                        <p class="card-text text-muted small" th:if="${tag.name == 'новинка'}">Новинки этого сезона</p>
+                        <p class="card-text text-muted small" th:if="${tag.name == 'распродажа'}">Товары со скидками</p>
+                        <p class="card-text text-muted small" th:if="${tag.name == 'популярный'}">Востребованные товары</p>
+                        <p class="card-text text-muted small" th:if="${tag.name == 'рекомендуем'}">Наши рекомендации</p>
+                        <a th:href="@{|/tag/${tag.slug}|}" class="btn btn-outline-primary btn-sm mt-2">Смотреть</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${tags == null or tags.isEmpty()}" class="text-center py-5">
+            <i class="fas fa-tags fa-4x text-muted mb-3"></i>
+            <p class="lead">Подборок пока нет</p>
+        </div>
+    </div>
+</th:block>

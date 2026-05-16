@@ -1,0 +1,40 @@
+<th:block th:fragment="content">
+    <div class="container-fluid">
+        <h1 class="mb-4">Управление изображениями</h1>
+
+        <div class="card mb-4">
+            <div class="card-header">Загрузить новое изображение</div>
+            <div class="card-body">
+                <form th:action="@{/admin/images/upload}" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="file" name="file" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">Загрузить</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Все изображения</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3" th:each="image : ${images}">
+                        <div class="card">
+                            <img th:src="@{|/uploads/general/${image}|}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                            <div class="card-body p-2 text-center">
+                                <p class="small text-truncate" th:text="${image}">filename.jpg</p>
+                                <form th:action="@{|/admin/images/delete/${image}|}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Удалить?')">Удалить</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>

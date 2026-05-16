@@ -1,0 +1,102 @@
+<th:block th:fragment="content">
+    <div class="container">
+        <h1 class="mb-4">Доставка и оплата</h1>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-truck me-2"></i> Способы доставки
+                    </div>
+                    <div class="card-body">
+                        <h5>Курьерская доставка</h5>
+                        <p>Доставка по городу Чебоксары — <strong>бесплатно</strong> при заказе от 1500 ₽. Срок доставки: 1-2 дня.</p>
+                        <hr>
+                        <h5>СДЭК</h5>
+                        <p>Доставка по всей России через СДЭК. Стоимость рассчитывается при оформлении заказа. Срок доставки: 2-7 дней.</p>
+                        <hr>
+                        <h5>Почта России</h5>
+                        <p>Доставка по всей России. Срок доставки: 5-14 дней.</p>
+                        <hr>
+                        <h5>Самовывоз</h5>
+                        <p>г. Чебоксары, ул. Примерная, 123. Пн-Пт: 10:00-19:00</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-credit-card me-2"></i> Способы оплаты
+                    </div>
+                    <div class="card-body">
+                        <h5>Оплата онлайн</h5>
+                        <p>Банковской картой (Visa, Mastercard, МИР) или через СБП. Онлайн-оплата проходит через защищённый шлюз Т-Банка.</p>
+                        <hr>
+                        <h5>Наличными при получении</h5>
+                        <p>Оплата наличными курьеру или в пункте выдачи.</p>
+                        <hr>
+                        <h5>Безналичный расчёт</h5>
+                        <p>Для юридических лиц и ИП. Выставляется счёт на оплату.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                Возврат товара
+            </div>
+            <div class="card-body">
+                <p>Вы можете вернуть товар надлежащего качества в течение 14 дней с момента получения. Товар должен быть не использован, сохранены товарный вид и упаковка.</p>
+                <p>Для оформления возврата свяжитесь с нами по email: <a href="mailto:shop@mobileshop.ru">shop@mobileshop.ru</a> или по телефону: <a href="tel:+78001234567">+7 (800) 123-45-67</a>.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                Часто задаваемые вопросы
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                Как отследить заказ?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                После отправки заказа вы получите трек-номер для отслеживания на email. Вы также можете отслеживать заказ в личном кабинете.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Можно ли изменить или отменить заказ?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Да, вы можете отменить заказ до момента его передачи в службу доставки. Для этого свяжитесь с нами любым удобным способом.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                Есть ли гарантия на товары?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Да, на все товары предоставляется гарантия от 6 до 12 месяцев в зависимости от категории товара.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>

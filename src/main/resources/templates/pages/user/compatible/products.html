@@ -1,0 +1,56 @@
+<th:block th:fragment="content">
+    <div class="container">
+        <div class="mb-4">
+            <a th:href="@{/compatible}" class="btn btn-outline-secondary btn-sm mb-3">← Назад к списку устройств</a>
+            <h1 class="mb-2" th:text="${compatibility.name}">Название устройства</h1>
+            <p class="text-muted" th:if="${compatibility.brand}">Бренд: <span th:text="${compatibility.brand}"></span></p>
+        </div>
+
+        <!-- Сортировка -->
+        <div class="row mb-4" th:if="${products.totalElements > 0}">
+            <div class="col-md-3 ms-auto">
+                <select class="form-select" onchange="window.location.href=this.value">
+                    <option th:selected="${filter.sortBy == null}" value="?sortBy=newest">По новизне</option>
+                    <option th:selected="${filter.sortBy == 'price_asc'}" value="?sortBy=price_asc">Цена по возрастанию</option>
+                    <option th:selected="${filter.sortBy == 'price_desc'}" value="?sortBy=price_desc">Цена по убыванию</option>
+                    <option th:selected="${filter.sortBy == 'name_asc'}" value="?sortBy=name_asc">Название (А-Я)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Товары -->
+        <div class="row">
+            <div class="col-md-3 mb-4" th:each="product : ${products.content}">
+                <div class="card h-100">
+                    <img th:src="${product.mainImage ?: '/images/no-image.jpg'}" class="card-img-top" style="height: 180px; object-fit: cover;">
+                    <div class="card-body">
+                        <h6 class="card-title" th:text="${product.name}">Название</h6>
+                        <p class="text-danger fw-bold" th:text="${product.formattedPrice}">0 ₽</p>
+                        <a th:href="@{|/product/${product.slug}|}" class="btn btn-sm btn-primary w-100">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Пагинация -->
+        <nav th:if="${products.totalPages > 1}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!products.first} ? '' : 'disabled'">
+                    <a class="page-link" th:href="@{__${#request.requestURI}__(page=${products.number - 1}, sortBy=${filter.sortBy})}">«</a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}" class="page-item" th:classappend="${i == products.number} ? 'active' : ''">
+                    <a class="page-link" th:href="@{__${#request.requestURI}__(page=${i}, sortBy=${filter.sortBy})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${!products.last} ? '' : 'disabled'">
+                    <a class="page-link" th:href="@{__${#request.requestURI}__(page=${products.number + 1}, sortBy=${filter.sortBy})}">»</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div th:if="${products.totalElements == 0}" class="text-center py-5">
+            <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+            <p class="lead">Нет товаров, совместимых с выбранным устройством</p>
+            <a th:href="@{/compatible}" class="btn btn-primary">Выбрать другое устройство</a>
+        </div>
+    </div>
+</th:block>

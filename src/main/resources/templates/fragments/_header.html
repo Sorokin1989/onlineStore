@@ -1,0 +1,49 @@
+<header th:fragment="_header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" th:href="@{/}">MobileShop</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/}">Главная</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/catalog}">Каталог</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/brands}">Бренды</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/contacts}">Контакты</a></li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" th:href="@{/admin}">Админка</a>
+                    </li>
+                </ul>
+                <form class="d-flex me-3" th:action="@{/search}" method="get">
+                    <input class="form-control form-control-sm" type="search" name="q" placeholder="Поиск...">
+                    <button class="btn btn-sm btn-outline-light ms-1" type="submit">🔍</button>
+                </form>
+                <a class="btn btn-outline-light position-relative me-2" th:href="@{/cart}">
+                    🛒 <span class="badge bg-danger" th:text="${session.cartCount ?: 0}">0</span>
+                </a>
+                <div th:with="user=${#authentication.principal}">
+                    <div th:if="${user == null || user == 'anonymousUser'}">
+                        <a class="btn btn-sm btn-outline-light" th:href="@{/login}">Вход</a>
+                        <a class="btn btn-sm btn-primary ms-1" th:href="@{/register}">Регистрация</a>
+                    </div>
+                    <div th:if="${user != null && user != 'anonymousUser'}">
+                        <div class="dropdown d-inline">
+                            <button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+                                👤 <span th:text="${user.fullName}">User</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" th:href="@{/profile}">Личный кабинет</a></li>
+                                <li><a class="dropdown-item" th:href="@{/wishlist}">Избранное</a></li>
+                                <li><a class="dropdown-item" th:href="@{/order/my-orders}">Мои заказы</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" th:href="@{/logout}" onclick="document.getElementById('logout-form').submit(); return false;">Выйти</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <form th:action="@{/logout}" method="post" id="logout-form" style="display: none;"></form>
+</header>

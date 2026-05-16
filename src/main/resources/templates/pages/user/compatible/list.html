@@ -1,0 +1,26 @@
+<th:block th:fragment="content">
+    <div class="container">
+        <h1 class="mb-4">Совместимость</h1>
+        <p class="lead mb-4">Выберите ваше устройство, чтобы найти подходящие аксессуары</p>
+
+        <div class="row">
+            <div class="col-md-3 mb-4" th:each="item : ${compatibilities}">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-mobile-alt fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title" th:text="${item.name}">Название устройства</h5>
+                        <p class="card-text text-muted small" th:if="${item.brand}" th:text="${item.brand}"></p>
+                        <a th:href="@{|/compatible/${item.name}|}" class="btn btn-outline-primary btn-sm mt-2">Выбрать</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${compatibilities == null or compatibilities.isEmpty()}" class="text-center py-5">
+            <i class="fas fa-list fa-4x text-muted mb-3"></i>
+            <p class="lead">Список устройств пока пуст</p>
+        </div>
+    </div>
+</th:block>

@@ -1,0 +1,41 @@
+
+<th:block th:fragment="content">
+    <div class="container">
+        <h1 class="mb-4">Контакты</h1>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Наш адрес</h3>
+                <p>г. Чебоксары, ул. Примерная, д. 123</p>
+                <h3>Телефон</h3>
+                <p>+7 (800) 123-45-67</p>
+                <h3>Email</h3>
+                <p>shop@mobileshop.ru</p>
+            </div>
+            <div class="col-md-6">
+                <h3>Режим работы</h3>
+                <p>Пн-Пт: 10:00 - 20:00</p>
+                <p>Сб-Вс: 11:00 - 18:00</p>
+
+                <h3>Форма обратной связи</h3>
+                <form th:action="@{/send-message}" method="post">
+                    <div class="mb-3">
+                        <input type="text" name="name" class="form-control" placeholder="Ваше имя" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="tel" name="phone" class="form-control" placeholder="Телефон">
+                    </div>
+                    <div class="mb-3">
+                        <textarea name="message" class="form-control" rows="5" placeholder="Сообщение" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>

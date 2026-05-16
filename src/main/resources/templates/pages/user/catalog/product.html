@@ -1,0 +1,158 @@
+<th:block th:fragment="content">
+    <div class="container">
+        <div class="row">
+            <!-- Изображения товара -->
+            <div class="col-md-5">
+                <div class="position-relative">
+                    <img th:src="${product.mainImage ?: '/images/no-image.jpg'}" class="img-fluid rounded" id="mainImage" style="width: 100%;">
+                    <div th:if="${product.discountPercent > 0}" class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 m-2 rounded">
+                        -<span th:text="${product.discountPercent}"></span>%
+                    </div>
+                </div>
+                <div class="row mt-2" th:if="${product.images != null and !product.images.isEmpty()}">
+                    <div class="col-3" th:each="img : ${product.images}">
+                        <img th:src="${img}" class="img-thumbnail" style="height: 80px; width: 100%; object-fit: cover; cursor: pointer;"
+                             onclick="document.getElementById('mainImage').src = this.src">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Информация о товаре -->
+            <div class="col-md-7">
+                <h1 th:text="${product.name}">Название товара</h1>
+                <div class="mb-3">
+                    <span class="text-danger fw-bold fs-3" th:text="${product.formattedPrice}">0 ₽</span>
+                    <span th:if="${product.oldPrice}" class="text-decoration-line-through text-muted ms-2"
+                          th:text="${#numbers.formatDecimal(product.oldPrice, 1, 'COMMA') + ' ₽'}"></span>
+                </div>
+
+                <div th:if="${product.brandName}" class="mb-2">
+                    <strong>Бренд:</strong> <a th:href="@{|/brands/${product.brandSlug}|}" th:text="${product.brandName}"></a>
+                </div>
+
+                <div th:if="${product.categoryName}" class="mb-2">
+                    <strong>Категория:</strong> <a th:href="@{|/catalog/${product.categorySlug}|}" th:text="${product.categoryName}"></a>
+                </div>
+
+                <div th:if="${product.inStock and product.quantity > 0}" class="alert alert-success py-2">
+                    <i class="fas fa-check-circle"></i> В наличии (<span th:text="${product.quantity}"></span> шт.)
+                </div>
+                <div th:unless="${product.inStock or product.quantity > 0}" class="alert alert-danger py-2">
+                    <i class="fas fa-times-circle"></i> Нет в наличии
+                </div>
+
+                <div class="mb-4">
+                    <div class="input-group" style="width: 150px;">
+                        <button class="btn btn-outline-secondary" type="button" onclick="decrement()">-</button>
+                        <input type="number" id="quantity" class="form-control text-center" value="1" min="1" th:max="${product.quantity}">
+                        <button class="btn btn-outline-secondary" type="button" onclick="increment()">+</button>
+                    </div>
+                </div>
+
+                <form th:action="@{/cart/add}" method="post" class="d-inline">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <input type="hidden" name="quantity" id="quantityInput" value="1">
+                    <button type="submit" class="btn btn-primary btn-lg" th:disabled="${!product.inStock or product.quantity == 0}">
+                        <i class="fas fa-shopping-cart"></i> Добавить в корзину
+                    </button>
+                </form>
+
+                <a th:href="@{/wishlist/add/{id}(id=${product.id})}" class="btn btn-outline-danger btn-lg ms-2" method="post">
+                    <i class="fas fa-heart"></i> В избранное
+                </a>
+            </div>
+        </div>
+
+        <!-- Описание товара -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3>Описание</h3>
+                <div th:utext="${product.description}"></div>
+            </div>
+        </div>
+
+        <!-- Характеристики -->
+        <div class="row mt-4" th:if="${product.specifications != null and !product.specifications.isEmpty()}">
+            <div class="col-12">
+                <h3>Характеристики</h3>
+                <table class="table table-bordered">
+                    <tr th:each="spec : ${product.specifications}">
+                        <th style="width: 30%;" th:text="${spec.specificationName}">Характеристика</th>
+                        <td th:text="${spec.value} + ' ' + ${spec.specificationUnit}">Значение</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Совместимость -->
+        <div class="row mt-4" th:if="${product.compatibilities != null and !product.compatibilities.isEmpty()}">
+            <div class="col-12">
+                <h3>Совместимость</h3>
+                <div>
+                    <span class="badge bg-secondary me-1 mb-1" th:each="comp : ${product.compatibilities}" th:text="${comp.name}"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Цвета -->
+        <div class="row mt-4" th:if="${product.colors != null and !product.colors.isEmpty()}">
+            <div class="col-12">
+                <h3>Цвета</h3>
+                <div>
+                    <span class="badge me-1 mb-1" th:each="color : ${product.colors}"
+                          th:style="'background-color: ' + ${color.hex} + '; color: white;'"
+                          th:text="${color.name}"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Похожие товары -->
+        <div class="row mt-5" th:if="${relatedProducts != null and !relatedProducts.isEmpty()}">
+            <div class="col-12">
+                <h3>Похожие товары</h3>
+                <div class="row">
+                    <div class="col-md-3 mb-4" th:each="product : ${relatedProducts}">
+                        <div class="card h-100">
+                            <img th:src="${product.mainImage ?: '/images/no-image.jpg'}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                            <div class="card-body">
+                                <h6 class="card-title" th:text="${product.name}">Название</h6>
+                                <p class="text-danger fw-bold" th:text="${product.formattedPrice}">0 ₽</p>
+                                <a th:href="@{|/product/${product.slug}|}" class="btn btn-sm btn-primary w-100">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quantityInput = document.getElementById('quantity');
+        const quantityHidden = document.getElementById('quantityInput');
+        const maxStock = [[${product.quantity}]];
+
+        function decrement() {
+            let val = parseInt(quantityInput.value);
+            if (val > 1) {
+                quantityInput.value = val - 1;
+                quantityHidden.value = val - 1;
+            }
+        }
+
+        function increment() {
+            let val = parseInt(quantityInput.value);
+            if (val < maxStock) {
+                quantityInput.value = val + 1;
+                quantityHidden.value = val + 1;
+            }
+        }
+
+        quantityInput.addEventListener('change', function() {
+            let val = parseInt(this.value);
+            if (isNaN(val) || val < 1) val = 1;
+            if (val > maxStock) val = maxStock;
+            quantityInput.value = val;
+            quantityHidden.value = val;
+        });
+    </script>
+</th:block>

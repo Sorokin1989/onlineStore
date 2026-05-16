@@ -1,0 +1,82 @@
+<th:block th:fragment="content">
+    <div class="container-fluid">
+        <h1 class="mb-4" th:text="${brand.id != null} ? 'Редактировать бренд' : 'Новый бренд'">Форма бренда</h1>
+
+        <!-- Сообщения об ошибках -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="${brand.id != null} ? @{/admin/brands/update/{id}(id=${brand.id})} : @{/admin/brands/create}"
+                      method="post" enctype="multipart/form-data" th:object="${brand}">
+
+                    <div class="mb-3">
+                        <label class="form-label">Название *</label>
+                        <input type="text" class="form-control" th:field="*{name}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Slug (URL)</label>
+                        <input type="text" class="form-control" th:field="*{slug}"
+                               placeholder="автоматически из названия">
+                        <small class="text-muted">Оставьте пустым для автоматической генерации</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Логотип</label>
+                        <input type="file" th:field="*{logoFile}" class="form-control" accept="image/*">
+                        <!-- вместо name="logo" используйте th:field="*{logoFile}" -->
+                        <div th:if="${brand.logo != null}" class="mt-2">
+                            <small>Текущий логотип:</small>
+                            <img th:src="@{/uploads/__${brand.logo}__}"
+                                 style="max-height: 50px;" class="img-thumbnail ms-2">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea class="form-control" rows="4" th:field="*{description}"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Порядок сортировки</label>
+                        <input type="number" class="form-control" th:field="*{sortOrder}" value="0">
+                        <small class="text-muted">Меньше число = выше в списке</small>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" th:field="*{active}">
+                        <label class="form-check-label">Активен</label>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <a th:href="@{/admin/brands}" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Генерация slug из названия
+        const nameInput = document.querySelector('[th\\:field="*{name}"]');
+        const slugInput = document.querySelector('[th\\:field="*{slug}"]');
+
+        if (nameInput && slugInput) {
+            nameInput.addEventListener('blur', function() {
+                if (!slugInput.value) {
+                    let slug = this.value
+                        .toLowerCase()
+                        .replace(/[^a-zа-яё0-9\s]/g, '')
+                        .replace(/\s+/g, '-')
+                        .replace(/[^a-z0-9-]/g, '');
+                    slugInput.value = slug;
+                }
+            });
+        }
+    </script>
+</th:block>

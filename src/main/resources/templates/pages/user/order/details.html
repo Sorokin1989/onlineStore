@@ -1,0 +1,154 @@
+<th:block th:fragment="content">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Детали заказа</h1>
+            <a th:href="@{/order/my-orders}" class="btn btn-outline-secondary">← Мои заказы</a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Информация о заказе -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <strong>Заказ № <span th:text="${order.orderNumber}"></span></strong>
+                        <span class="float-end" th:text="${order.createdAt}"></span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Статус:</strong>
+                                <span class="badge"
+                                      th:classappend="${order.status == 'NEW'} ? 'bg-warning' :
+                                                      (${order.status == 'PAID'} ? 'bg-info' :
+                                                      (${order.status == 'PROCESSING'} ? 'bg-primary' :
+                                                      (${order.status == 'DELIVERED'} ? 'bg-success' :
+                                                      (${order.status == 'CANCELLED'} ? 'bg-danger' : 'bg-secondary'))))"
+                                      th:text="${order.statusDisplay}"></span>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <strong>Способ оплаты:</strong> <span th:text="${order.paymentMethodDisplay}"></span>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Получатель:</strong> <span th:text="${order.fullName}"></span><br>
+                                <strong>Email:</strong> <span th:text="${order.email}"></span><br>
+                                <strong>Телефон:</strong> <span th:text="${order.phone}"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Адрес доставки:</strong><br>
+                                <span th:text="${order.address}"></span><br>
+                                <div th:if="${order.comment}">
+                                    <strong>Комментарий:</strong><br>
+                                    <span th:text="${order.comment}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Товары в заказе -->
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        Состав заказа
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-bordered mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Товар</th>
+                                <th width="100">Цена</th>
+                                <th width="80">Кол-во</th>
+                                <th width="120">Сумма</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${order.items}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img th:src="${item.productImage ?: '/images/no-image.jpg'}" width="50" class="me-2">
+                                        <div>
+                                            <a th:href="@{|/product/${item.productSlug}|}" th:text="${item.productName}"></a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:text="${item.formattedPrice}"></td>
+                                <td th:text="${item.quantity}"></td>
+                                <td th:text="${item.formattedTotal}"></td>
+                            </tr>
+                            </tbody>
+                            <tfoot class="table-light">
+                            <tr>
+                                <th colspan="3" class="text-end">Итого:</th>
+                                <th th:text="${order.formattedTotal}"></th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Блок для повторного заказа -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        Действия
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-outline-primary w-100 mb-2" onclick="repeatOrder()">
+                            <i class="fas fa-repeat"></i> Повторить заказ
+                        </button>
+
+                        <div th:if="${order.status == 'NEW' or order.status == 'PAID'}">
+                            <button class="btn btn-outline-danger w-100" onclick="cancelOrder()">
+                                <i class="fas fa-times-circle"></i> Отменить заказ
+                            </button>
+                            <small class="text-muted d-block mt-2">Отмена доступна до отправки заказа</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Блок с информацией об оплате -->
+                <div class="card" th:if="${order.paymentId}">
+                    <div class="card-header bg-secondary text-white">
+                        Информация об оплате
+                    </div>
+                    <div class="card-body">
+                        <p>ID платежа: <span th:text="${order.paymentId}"></span></p>
+                        <div th:if="${!order.paid}">
+                            <button class="btn btn-success w-100" onclick="payOrder()">
+                                <i class="fas fa-credit-card"></i> Оплатить заказ
+                            </button>
+                        </div>
+                        <div th:if="${order.paid}" class="alert alert-success mt-2 mb-0">
+                            <i class="fas fa-check-circle"></i> Заказ оплачен
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function repeatOrder() {
+            if (confirm('Добавить все товары из этого заказа в корзину?')) {
+                fetch('/order/repeat/' + [[${order.orderNumber}]], { method: 'POST' })
+                    .then(() => window.location.href = '/cart');
+            }
+        }
+
+        function cancelOrder() {
+            if (confirm('Вы уверены, что хотите отменить заказ?')) {
+                fetch('/order/cancel/' + [[${order.orderNumber}]], { method: 'POST' })
+                    .then(() => window.location.reload());
+            }
+        }
+
+        function payOrder() {
+            window.location.href = '/payment/create/' + [[${order.id}]];
+        }
+    </script>
+</th:block>

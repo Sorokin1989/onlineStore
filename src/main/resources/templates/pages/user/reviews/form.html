@@ -1,0 +1,117 @@
+<th:block th:fragment="content">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-star me-2"></i> Добавить отзыв
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                        <div class="text-center mb-4">
+                            <img th:src="${product.mainImage ?: '/images/no-image.jpg'}"
+                                 class="img-fluid rounded" style="max-height: 150px;">
+                            <h5 class="mt-2" th:text="${product.name}">Название товара</h5>
+                        </div>
+
+                        <form th:action="@{|/reviews/add/${product.id}|}" method="post"
+                              th:object="${review}">
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Ваша оценка</label>
+                                <div class="rating">
+                                    <input type="radio" th:field="*{rating}" value="5" id="star5" class="d-none">
+                                    <label for="star5" class="text-warning fs-2" onclick="setRating(5)">★</label>
+                                    <input type="radio" th:field="*{rating}" value="4" id="star4" class="d-none">
+                                    <label for="star4" class="text-warning fs-2" onclick="setRating(4)">★</label>
+                                    <input type="radio" th:field="*{rating}" value="3" id="star3" class="d-none">
+                                    <label for="star3" class="text-warning fs-2" onclick="setRating(3)">★</label>
+                                    <input type="radio" th:field="*{rating}" value="2" id="star2" class="d-none">
+                                    <label for="star2" class="text-warning fs-2" onclick="setRating(2)">★</label>
+                                    <input type="radio" th:field="*{rating}" value="1" id="star1" class="d-none">
+                                    <label for="star1" class="text-warning fs-2" onclick="setRating(1)">★</label>
+                                </div>
+                                <div id="ratingError" class="text-danger small mt-1" style="display: none;">Выберите оценку</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ваш комментарий</label>
+                                <textarea th:field="*{comment}" class="form-control" rows="5"
+                                          placeholder="Расскажите о своих впечатлениях о товаре..." required></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Достоинства (необязательно)</label>
+                                <input type="text" name="pros" class="form-control" placeholder="Что вам понравилось?">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Недостатки (необязательно)</label>
+                                <input type="text" name="cons" class="form-control" placeholder="Что можно улучшить?">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100" onclick="return validateRating()">
+                                <i class="fas fa-paper-plane me-1"></i> Отправить отзыв
+                            </button>
+                        </form>
+
+                        <hr>
+
+                        <div class="text-center">
+                            <a th:href="@{|/product/${product.slug}|}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Вернуться к товару
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedRating = 0;
+
+        function setRating(rating) {
+            selectedRating = rating;
+            // Обновляем звёзды
+            const stars = document.querySelectorAll('.rating label');
+            for (let i = 0; i < stars.length; i++) {
+                if (i < rating) {
+                    stars[i].style.color = '#ffc107';
+                } else {
+                    stars[i].style.color = '#dee2e6';
+                }
+            }
+            document.getElementById('ratingError').style.display = 'none';
+        }
+
+        function validateRating() {
+            if (selectedRating === 0) {
+                document.getElementById('ratingError').style.display = 'block';
+                return false;
+            }
+            return true;
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedValue = document.querySelector('input[name="rating"]:checked');
+            if (selectedValue) {
+                setRating(parseInt(selectedValue.value));
+            }
+        });
+    </script>
+
+    <style>
+        .rating label {
+            cursor: pointer;
+            transition: color 0.2s;
+            margin-right: 5px;
+            color: #dee2e6;
+        }
+        .rating label:hover {
+            color: #ffc107 !important;
+        }
+    </style>
+</th:block>

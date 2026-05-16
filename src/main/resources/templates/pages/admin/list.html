@@ -1,0 +1,41 @@
+<th:block th:fragment="content">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 th:text="${title}">Управление</h1>
+            <a th:href="@{|/admin/${createUrl}|}" class="btn btn-primary">+ Добавить</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${items}">
+                            <td th:text="${item.id}">1</td>
+                            <td th:text="${item.name}">Название</td>
+                            <td>
+                                <span th:if="${item.active}" class="badge bg-success">Активен</span>
+                                <span th:unless="${item.active}" class="badge bg-secondary">Неактивен</span>
+                            </td>
+                            <td>
+                                <a th:href="@{|/admin/${editUrl}/${item.id}|}" class="btn btn-sm btn-warning">✏️</a>
+                                <form th:action="@{|/admin/${deleteUrl}/${item.id}|}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Удалить?')">🗑️</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
