@@ -1,6 +1,8 @@
 package com.example.onlineStore.service;
 
+import com.example.onlineStore.dto.BrandDto;
 import com.example.onlineStore.entity.Brand;
+import com.example.onlineStore.mapper.BrandMapper;
 import com.example.onlineStore.repository.BrandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import java.util.Optional;
 public class BrandService {
 
     private final BrandRepository brandRepository;
+    private final BrandMapper brandMapper;  // ← добавить маппер
 
     public List<Brand> getAllBrands() {
         return brandRepository.findAll();
@@ -35,25 +38,40 @@ public class BrandService {
     }
 
     @Transactional
-    public Brand createBrand(Brand brand) {
-        if (brand.getSlug() == null || brand.getSlug().isEmpty()) {
-            brand.setSlug(transliterate(brand.getName()));
+    public BrandDto createBrand(BrandDto brandDto) {  // ← возвращаем DTO
+        // Генерируем slug если пустой
+        if (brandDto.getSlug() == null || brandDto.getSlug().isEmpty()) {
+            brandDto.setSlug(transliterate(brandDto.getName()));
         }
-        return brandRepository.save(brand);
+
+        // DTO → Entity
+        Brand brand = brandMapper.toEntity(brandDto);
+
+        // Сохраняем Entity
+        Brand savedBrand = brandRepository.save(brand);
+
+        // Entity → DTO и возвращаем
+        return brandMapper.toDto(savedBrand);
     }
 
     @Transactional
-    public Brand updateBrand(Long id, Brand updatedBrand) {
+    public BrandDto updateBrand(Long id, BrandDto brandDto) {  // ← возвращаем DTO
         Brand existing = brandRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Бренд не найден"));
 
-        existing.setName(updatedBrand.getName());
-        existing.setSlug(updatedBrand.getSlug());
-        existing.setLogo(updatedBrand.getLogo());
-        existing.setDescription(updatedBrand.getDescription());
-        existing.setActive(updatedBrand.getActive());
+        // Обновляем поля
+        existing.setName(brandDto.getName());
+        existing.setSlug(brandDto.getSlug());
+        existing.setLogo(brandDto.getLogo());
+        existing.setDescription(brandDto.getDescription());
+        existing.setSortOrder(brandDto.getSortOrder() != null ? brandDto.getSortOrder() : 0);
+        existing.setActive(brandDto.getActive());
 
-        return brandRepository.save(existing);
+        // Сохраняем
+        Brand updatedBrand = brandRepository.save(existing);
+
+        // Entity → DTO и возвращаем
+        return brandMapper.toDto(updatedBrand);
     }
 
     @Transactional
@@ -62,6 +80,8 @@ public class BrandService {
     }
 
     private String transliterate(String input) {
+        if (input == null) return "";
+
         return input.toLowerCase()
                 .replace(" ", "-")
                 .replace("а", "a").replace("б", "b").replace("в", "v")

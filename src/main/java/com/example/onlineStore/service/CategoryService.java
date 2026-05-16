@@ -32,6 +32,9 @@ public class CategoryService {
 
     // Получить категорию по ID
     public Optional<Category> getCategoryById(Long id) {
+        if (id == null) {
+            return Optional.empty();  // ← защита от null
+        }
         return categoryRepository.findById(id);
     }
 

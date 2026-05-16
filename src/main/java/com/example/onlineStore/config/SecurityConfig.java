@@ -21,17 +21,14 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class SecurityConfig {
 
     private final UserService userService;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService)
-                .passwordEncoder(passwordEncoder());
+                .passwordEncoder(passwordEncoder);
     }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -44,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/catalog/**", "/product/**", "/search", "/brands/**",
                                 "/compatible/**", "/tag/**", "/page/**", "/contacts", "/about",
                                 "/delivery", "/login", "/register", "/css/**", "/js/**",
-                                "/images/**", "/uploads/**").permitAll()
+                                "/images/**", "/uploads/**","/error/**","/css/**", "/js/**").permitAll()
                         // Требуют авторизации
                         .requestMatchers("/cart/**", "/order/**", "/profile/**", "/wishlist/**", "/reviews/add/**").authenticated()
                         // Админка

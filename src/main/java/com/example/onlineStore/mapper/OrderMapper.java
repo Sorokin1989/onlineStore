@@ -5,6 +5,7 @@ import com.example.onlineStore.dto.OrderItemDto;
 import com.example.onlineStore.entity.Order;
 import com.example.onlineStore.entity.OrderItem;
 import com.example.onlineStore.entity.User;
+import com.example.onlineStore.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
@@ -38,7 +39,7 @@ public class OrderMapper {
         dto.setComment(entity.getComment());
         dto.setTotal(entity.getTotal());
         dto.setDeliveryCost(entity.getDeliveryCost());
-        dto.setStatus(entity.getStatus());
+        dto.setStatus(String.valueOf(entity.getStatus()));
         dto.setPaymentMethod(entity.getPaymentMethod());
         dto.setPaymentId(entity.getPaymentId());
         dto.setCreatedAt(entity.getCreatedAt());
@@ -82,7 +83,7 @@ public class OrderMapper {
         entity.setComment(dto.getComment());
         entity.setTotal(dto.getTotal());
         entity.setDeliveryCost(dto.getDeliveryCost() != null ? dto.getDeliveryCost() : BigDecimal.ZERO);
-        entity.setStatus("NEW");
+        entity.setStatus(OrderStatus.valueOf("NEW"));
         entity.setPaymentMethod(dto.getPaymentMethod());
         entity.setUser(user);
         entity.setCreatedAt(LocalDateTime.now());

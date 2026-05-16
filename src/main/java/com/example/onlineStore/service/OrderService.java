@@ -5,6 +5,7 @@ import com.example.onlineStore.entity.Order;
 import com.example.onlineStore.entity.OrderItem;
 import com.example.onlineStore.entity.Product;
 import com.example.onlineStore.entity.User;
+import com.example.onlineStore.enums.OrderStatus;
 import com.example.onlineStore.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -65,7 +66,7 @@ public class OrderService {
         order.setAddress(address);
         order.setComment(comment);
         order.setPaymentMethod(paymentMethod);
-        order.setStatus("NEW");
+        order.setStatus(OrderStatus.NEW);
         order.setCreatedAt(LocalDateTime.now());
 
         // Вычисляем сумму и создаём позиции заказа
@@ -119,12 +120,12 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Заказ не найден"));
 
-        order.setStatus(status);
+        order.setStatus(OrderStatus.valueOf(status));
         return orderRepository.save(order);
     }
 
     // Получить заказы по статусу
-    public List<Order> getOrdersByStatus(String status) {
+    public List<Order> getOrdersByStatus(OrderStatus status) {
         return orderRepository.findByStatusOrderByCreatedAtDesc(status);
     }
 
@@ -132,5 +133,19 @@ public class OrderService {
     private String generateOrderNumber() {
         return "ORD-" + System.currentTimeMillis() + "-" +
                 java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+
+    // Проверяет, покупал ли пользователь данный товар
+    // OrderService.java - оптимизированная версия
+    public boolean hasUserBoughtProduct(User user, Product product) {
+        if (user == null || product == null) {
+            return false;
+        }
+
+        return orderRepository.existsByUserAndProductAndStatusIn(
+                user,
+                product.getId(),
+                List.of(OrderStatus.PAID, OrderStatus.DELIVERED)
+        );
     }
 }

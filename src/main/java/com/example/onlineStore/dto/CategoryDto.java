@@ -1,41 +1,27 @@
 package com.example.onlineStore.dto;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class CategoryDto {
-
     private Long id;
     private String name;
-    private String slug;           // ← добавить
+    private String slug;
     private String description;
     private String imagePath;
-    private Integer sortOrder;
-    private Boolean active;
-
-    // Для иерархии категорий
+    private MultipartFile imageFile;  // для загрузки файла
     private Long parentId;
     private String parentName;
-    private List<CategoryDto> children = new ArrayList<>();
+    private Integer sortOrder = 0;
+    private Boolean active = true;
 
-    // Статистика (для админки)
-    private Long productsCount;
+    // Добавьте эти поля:
+    private String seoTitle;      // SEO заголовок
+    private String seoDescription; // SEO описание
 
-    // Конструктор для базовой информации
-    public CategoryDto(Long id, String name, String imagePath) {
-        this.id = id;
-        this.name = name;
-        this.imagePath = imagePath;
-    }
-
-    // Вспомогательные методы
-    public boolean hasChildren() {
-        return children != null && !children.isEmpty();
-    }
+    // Если нужны другие поля:
+    private String metaTitle;
+    private String metaDescription;
+    private String seoKeywords;
 }

@@ -2,6 +2,7 @@ package com.example.onlineStore.mapper;
 
 import com.example.onlineStore.dto.UserDto;
 import com.example.onlineStore.entity.User;
+import com.example.onlineStore.enums.UserRole;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.util.Collections;
@@ -22,7 +23,7 @@ public class UserMapper {
         dto.setEmail(entity.getEmail());
         dto.setFullName(entity.getFullName());
         dto.setPhone(entity.getPhone());
-        dto.setRole(entity.getRole());
+        dto.setRole(String.valueOf(entity.getRole()));
         dto.setCreatedAt(entity.getCreatedAt());
 
         return dto;
@@ -43,7 +44,7 @@ public class UserMapper {
         entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         entity.setFullName(dto.getFullName());
         entity.setPhone(dto.getPhone());
-        entity.setRole("ROLE_USER");
+        entity.setRole(UserRole.valueOf("ROLE_USER"));
         return entity;
     }
 

@@ -76,4 +76,8 @@ public class FileStorageService {
     public String getSubDirPath(String subDir) {
         return Paths.get(uploadPath, subDir).toString();
     }
+
+    public String getUploadPath() {
+        return uploadPath;
+    }
 }

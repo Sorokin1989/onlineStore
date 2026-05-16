@@ -33,4 +33,6 @@ public class Brand {
 
     @OneToMany(mappedBy = "brand")
     private List<Product> products = new ArrayList<>();
+    @Column(name = "sort_order")
+    private Integer sortOrder = 0;
 }

@@ -112,11 +112,11 @@ public class ProductMapper {
         entity.setBrand(brand);
 
         // Гарантия
-        if (dto.getWarrantyId() != null) {
-            Warranty warranty = new Warranty();
-            warranty.setId(dto.getWarrantyId());
-            entity.setWarranty(warranty);
-        }
+//        if (dto.getWarrantyId() != null) {
+//            Warranty warranty = new Warranty();
+//            warranty.setId(dto.getWarrantyId());
+//            entity.setWarranty(warranty);
+//        }
 
         return entity;
     }

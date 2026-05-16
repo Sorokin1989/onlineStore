@@ -14,27 +14,22 @@ public class PageService {
 
     private final PageRepository pageRepository;
 
-    // Получить все страницы
     public List<Page> getAllPages() {
         return pageRepository.findAll();
     }
 
-    // Получить активные страницы (для меню)
     public List<Page> getActivePages() {
         return pageRepository.findByActiveTrueOrderBySortOrderAsc();
     }
 
-    // Получить страницу по Slug
     public Optional<Page> getPageBySlug(String slug) {
         return pageRepository.findBySlug(slug);
     }
 
-    // Получить страницу по ID
     public Optional<Page> getPageById(Long id) {
         return pageRepository.findById(id);
     }
 
-    // Создать новую страницу
     @Transactional
     public Page createPage(Page page) {
         if (page.getSlug() == null || page.getSlug().isEmpty()) {
@@ -43,7 +38,6 @@ public class PageService {
         return pageRepository.save(page);
     }
 
-    // Обновить страницу
     @Transactional
     public Page updatePage(Long id, Page updatedPage) {
         Page existing = pageRepository.findById(id)
@@ -60,13 +54,11 @@ public class PageService {
         return pageRepository.save(existing);
     }
 
-    // Удалить страницу
     @Transactional
     public void deletePage(Long id) {
         pageRepository.deleteById(id);
     }
 
-    // Транслитерация для генерации slug
     private String transliterate(String input) {
         if (input == null) return "";
         return input.toLowerCase()

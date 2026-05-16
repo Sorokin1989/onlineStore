@@ -3,6 +3,8 @@ package com.example.onlineStore.service;
 import com.example.onlineStore.dto.ProductFilterDto;
 import com.example.onlineStore.entity.Category;
 import com.example.onlineStore.entity.Product;
+import com.example.onlineStore.entity.ProductImage;
+import com.example.onlineStore.repository.ProductImageRepository;
 import com.example.onlineStore.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService {
 
+    private final ProductImageRepository productImageRepository;
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
 
@@ -158,5 +161,48 @@ public class ProductService {
                 .replace("ы", "y").replace("ь", "").replace("э", "e").replace("ю", "yu")
                 .replace("я", "ya").replace(" ", "-")
                 .replaceAll("[^a-z0-9-]", "");
+    }
+
+// ProductService.java
+
+    @Transactional
+    public void addImage(Product product, String imagePath) {
+        if (product == null) {
+            throw new RuntimeException("Товар не найден");
+        }
+
+        ProductImage productImage = new ProductImage();
+        productImage.setProduct(product);
+        productImage.setImagePath(imagePath);
+        productImage.setIsMain(product.getImages().isEmpty()); // первое изображение становится главным
+        productImage.setSortOrder(product.getImages().size());
+
+        productImageRepository.save(productImage);
+    }
+
+    // ProductService.java
+
+    public Long getProductIdByImageId(Long imageId) {
+        ProductImage image = productImageRepository.findById(imageId)
+                .orElseThrow(() -> new RuntimeException("Изображение не найдено"));
+        return image.getProduct().getId();
+    }
+
+    // ProductService.java
+
+    @Transactional
+    public void deleteImage(Long imageId) {
+        ProductImage image = productImageRepository.findById(imageId)
+                .orElseThrow(() -> new RuntimeException("Изображение не найдено"));
+
+        Long productId = image.getProduct().getId();
+        productImageRepository.delete(image);
+
+        // Если удалили главное изображение, делаем первое доступное главным
+        List<ProductImage> remainingImages = productImageRepository.findByProductIdOrderBySortOrderAsc(productId);
+        if (!remainingImages.isEmpty() && !remainingImages.get(0).getIsMain()) {
+            remainingImages.get(0).setIsMain(true);
+            productImageRepository.save(remainingImages.get(0));
+        }
     }
 }

@@ -37,13 +37,13 @@ public class CategoryMapper {
                 .collect(Collectors.toList());
     }
 
-    public CategoryDto toDtoWithChildren(Category category) {
-        CategoryDto dto = toDto(category);
-        if (category.getChildren() != null && !category.getChildren().isEmpty()) {
-            dto.setChildren(toDtoList(category.getChildren()));
-        }
-        return dto;
-    }
+//    public CategoryDto toDtoWithChildren(Category category) {
+//        CategoryDto dto = toDto(category);
+//        if (category.getChildren() != null && !category.getChildren().isEmpty()) {
+//            dto.setChildren(toDtoList(category.getChildren()));
+//        }
+//        return dto;
+//    }
 
     // Для создания (без ID)
     public Category toEntity(CategoryDto dto, Category parent) {

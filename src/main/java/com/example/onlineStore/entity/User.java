@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,15 +43,19 @@ public class User implements UserDetails {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user")
     private List<Order> orders = new ArrayList<>();
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user")
     private List<CartItem> cartItems = new ArrayList<>();
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user")
     private List<Review> reviews = new ArrayList<>();
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user")
     private List<Favorite> favorites = new ArrayList<>();
 
