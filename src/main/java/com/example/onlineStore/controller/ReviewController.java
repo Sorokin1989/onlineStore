@@ -30,58 +30,52 @@ public class ReviewController {
     private final UserService userService;
     private final ReviewMapper reviewMapper;
 
-    // Страница добавления отзыва
     @GetMapping("/add/{productId}")
     public String reviewForm(@PathVariable Long productId,
                              @AuthenticationPrincipal UserDetails userDetails,
                              Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-
-        User user = userService.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        User user = getUserFromDetails(userDetails);
         Product product = productService.getProductById(productId)
                 .orElseThrow(() -> new RuntimeException("Товар не найден"));
 
-        // Проверка, покупал ли пользователь этот товар
         boolean canReview = orderService.hasUserBoughtProduct(user, product);
-
         if (!canReview) {
             return "redirect:/product/" + product.getSlug() + "?error=not_purchased";
         }
 
         model.addAttribute("product", product);
         model.addAttribute("review", new ReviewRequest());
+        model.addAttribute("content", "pages/user/reviews/form :: content");
 
-        return "reviews/form";
+        return "layouts/main";
     }
 
-    // Сохранение отзыва
     @PostMapping("/add/{productId}")
     public String addReview(@PathVariable Long productId,
                             @Valid @ModelAttribute ReviewRequest reviewRequest,
                             BindingResult bindingResult,
                             @AuthenticationPrincipal UserDetails userDetails,
                             Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-
         if (bindingResult.hasErrors()) {
             model.addAttribute("product", productService.getProductById(productId).orElse(null));
-            return "reviews/form";
+            model.addAttribute("content", "pages/user/reviews/form :: content");
+            return "layouts/main";
         }
 
-        User user = userService.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        User user = getUserFromDetails(userDetails);
         Product product = productService.getProductById(productId)
                 .orElseThrow(() -> new RuntimeException("Товар не найден"));
 
         reviewService.createReview(product, user, reviewRequest.getRating(), reviewRequest.getComment());
 
         return "redirect:/product/" + product.getSlug() + "?review_added";
+    }
+
+    private User getUserFromDetails(UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new RuntimeException("Пользователь не авторизован");
+        }
+        return userService.getUserByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
     }
 }

@@ -29,15 +29,14 @@ public class TagController {
     private final TagMapper tagMapper;
     private final ProductMapper productMapper;
 
-    // Все теги
     @GetMapping
     public String allTags(Model model) {
         List<Tag> tags = tagService.getActiveTags();
         model.addAttribute("tags", tagMapper.toDtoList(tags));
-        return "tags/list";
+        model.addAttribute("content", "pages/user/tags/list :: content");
+        return "layouts/main";
     }
 
-    // Товары по тегу (хиты, новинки, распродажа)
     @GetMapping("/{slug}")
     public String tagProducts(@PathVariable String slug, ProductFilterDto filter, Model model) {
         Tag tag = tagService.getTagBySlug(slug)
@@ -50,7 +49,7 @@ public class TagController {
         model.addAttribute("tag", tagMapper.toDto(tag));
         model.addAttribute("products", productDtos);
         model.addAttribute("filter", filter);
-
-        return "tags/products";
+        model.addAttribute("content", "pages/user/tags/products :: content");
+        return "layouts/main";
     }
 }

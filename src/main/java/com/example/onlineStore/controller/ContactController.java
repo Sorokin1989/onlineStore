@@ -20,8 +20,9 @@ public class ContactController {
     private String adminEmail;
 
     @GetMapping("/contacts")
-    public String contacts() {
-        return "contacts";
+    public String contacts(Model model) {
+        model.addAttribute("content", "pages/user/contacts/contacts :: content");
+        return "layouts/main";
     }
 
     @PostMapping("/send-message")
@@ -43,10 +44,12 @@ public class ContactController {
             mailSender.send(mail);
 
             model.addAttribute("success", "Сообщение отправлено! Мы свяжемся с вами в ближайшее время.");
+            model.addAttribute("content", "pages/user/contacts/contacts :: content");
         } catch (Exception e) {
             model.addAttribute("error", "Ошибка при отправке. Попробуйте позже или напишите нам напрямую на email.");
+            model.addAttribute("content", "pages/user/contacts/contacts :: content");
         }
 
-        return "contacts";
+        return "layouts/main";
     }
 }

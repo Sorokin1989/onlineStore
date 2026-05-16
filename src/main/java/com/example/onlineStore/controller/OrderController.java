@@ -29,7 +29,6 @@ public class OrderController {
     private final UserService userService;
     private final OrderMapper orderMapper;
 
-    // Страница оформления заказа
     @GetMapping("/checkout")
     public String checkoutForm(HttpSession session,
                                @AuthenticationPrincipal UserDetails userDetails,
@@ -37,15 +36,12 @@ public class OrderController {
         String sessionId = cartService.getOrCreateSessionId(session);
         User user = getUserFromDetails(userDetails);
 
-        // Проверка, что корзина не пуста
         int cartSize = cartService.getCartItemsCount(sessionId, user);
         if (cartSize == 0) {
             return "redirect:/cart";
         }
 
         OrderRequest orderRequest = new OrderRequest();
-
-        // Заполняем данными пользователя, если авторизован
         if (user != null) {
             orderRequest.setFullName(user.getFullName());
             orderRequest.setEmail(user.getEmail());
@@ -54,11 +50,11 @@ public class OrderController {
 
         model.addAttribute("orderRequest", orderRequest);
         model.addAttribute("total", cartService.getCartTotal(sessionId, user));
+        model.addAttribute("content", "pages/user/order/checkout :: content");
 
-        return "order/checkout";
+        return "layouts/main";
     }
 
-    // Создание заказа
     @PostMapping("/create")
     public String createOrder(@Valid @ModelAttribute OrderRequest orderRequest,
                               BindingResult bindingResult,
@@ -70,7 +66,8 @@ public class OrderController {
             String sessionId = cartService.getOrCreateSessionId(session);
             User user = getUserFromDetails(userDetails);
             model.addAttribute("total", cartService.getCartTotal(sessionId, user));
-            return "order/checkout";
+            model.addAttribute("content", "pages/user/order/checkout :: content");
+            return "layouts/main";
         }
 
         try {
@@ -95,22 +92,22 @@ public class OrderController {
             String sessionId = cartService.getOrCreateSessionId(session);
             User user = getUserFromDetails(userDetails);
             model.addAttribute("total", cartService.getCartTotal(sessionId, user));
-            return "order/checkout";
+            model.addAttribute("content", "pages/user/order/checkout :: content");
+            return "layouts/main";
         }
     }
 
-    // Страница успешного заказа
     @GetMapping("/success/{orderNumber}")
     public String success(@PathVariable String orderNumber, Model model) {
         Order order = orderService.getOrderByNumber(orderNumber)
                 .orElseThrow(() -> new RuntimeException("Заказ не найден"));
 
         model.addAttribute("order", orderMapper.toDto(order));
+        model.addAttribute("content", "pages/user/order/success :: content");
 
-        return "order/success";
+        return "layouts/main";
     }
 
-    // Личный кабинет — мои заказы
     @GetMapping("/my-orders")
     public String myOrders(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = getUserFromDetails(userDetails);
@@ -121,11 +118,11 @@ public class OrderController {
 
         List<Order> orders = orderService.getUserOrders(user);
         model.addAttribute("orders", orderMapper.toDtoList(orders));
+        model.addAttribute("content", "pages/user/order/my-orders :: content");
 
-        return "order/my-orders";
+        return "layouts/main";
     }
 
-    // Детали заказа
     @GetMapping("/{orderNumber}")
     public String orderDetails(@PathVariable String orderNumber,
                                @AuthenticationPrincipal UserDetails userDetails,
@@ -135,18 +132,16 @@ public class OrderController {
 
         User user = getUserFromDetails(userDetails);
 
-        // Проверка прав: только владелец заказа
         if (user != null && order.getUser() != null && !order.getUser().getId().equals(user.getId())) {
             return "redirect:/order/my-orders";
         }
 
-        // Если заказ без пользователя (гость) — показываем по номеру
         model.addAttribute("order", orderMapper.toDto(order));
+        model.addAttribute("content", "pages/user/order/details :: content");
 
-        return "order/details";
+        return "layouts/main";
     }
 
-    // Получение пользователя из UserDetails
     private User getUserFromDetails(UserDetails userDetails) {
         if (userDetails == null) return null;
         return userService.getUserByEmail(userDetails.getUsername()).orElse(null);

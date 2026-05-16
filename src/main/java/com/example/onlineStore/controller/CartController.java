@@ -41,8 +41,9 @@ public class CartController {
         model.addAttribute("cartItems", cartItemDtos);
         model.addAttribute("total", total);
         model.addAttribute("itemsCount", itemsCount);
+        model.addAttribute("content","pages/user/cart/cart :: content");
 
-        return "cart/index";
+        return "layouts/main";
     }
 
     // Добавить в корзину

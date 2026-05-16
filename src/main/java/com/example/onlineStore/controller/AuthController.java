@@ -36,15 +36,17 @@ public class AuthController {
         if (registered != null) {
             model.addAttribute("message", "Регистрация успешна! Войдите в аккаунт.");
         }
+        model.addAttribute("content","pages/user/login :: content");
 
-        return "auth/login";
+        return "layouts/main";
     }
 
     // Страница регистрации
     @GetMapping("/register")
     public String registerForm(Model model) {
         model.addAttribute("user", new UserRegistrationRequest());
-        return "auth/register";
+        model.addAttribute("content", "pages/user/register :: content");
+        return "layouts/main";
     }
 
     // Обработка регистрации
@@ -54,13 +56,14 @@ public class AuthController {
                            Model model) {
 
         if (bindingResult.hasErrors()) {
-            return "auth/register";
+            model.addAttribute("page", "pages/user/register");
+            return "layouts/main";
         }
 
         // Проверка, что пароли совпадают
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             model.addAttribute("error", "Пароли не совпадают");
-            return "auth/register";
+            return "layouts/main";
         }
 
         try {
@@ -73,7 +76,7 @@ public class AuthController {
             return "redirect:/login?registered";
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            return "auth/register";
+            return "layouts/main";
         }
     }
 }

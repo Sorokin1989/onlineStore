@@ -19,49 +19,37 @@ public class ProfileController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    // Страница профиля
     @GetMapping
     public String profile(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-
-        User user = userService.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        User user = getUserFromDetails(userDetails);
         model.addAttribute("user", userMapper.toDto(user));
-        return "profile/index";
+        model.addAttribute("content", "pages/user/profile/index :: content");
+        return "layouts/main";
     }
 
-    // Форма редактирования профиля
     @GetMapping("/edit")
     public String editForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        User user = userService.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        User user = getUserFromDetails(userDetails);
         model.addAttribute("user", userMapper.toDto(user));
-        return "profile/edit";
+        model.addAttribute("content", "pages/user/profile/edit :: content");
+        return "layouts/main";
     }
 
-    // Обновление профиля
     @PostMapping("/update")
     public String updateProfile(@AuthenticationPrincipal UserDetails userDetails,
                                 @RequestParam String fullName,
                                 @RequestParam String phone) {
-        User user = userService.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        User user = getUserFromDetails(userDetails);
         userService.updateProfile(user.getId(), fullName, phone);
         return "redirect:/profile?updated";
     }
 
-    // Форма смены пароля
     @GetMapping("/change-password")
-    public String changePasswordForm() {
-        return "profile/change-password";
+    public String changePasswordForm(Model model) {
+        model.addAttribute("content", "pages/user/profile/change-password :: content");
+        return "layouts/main";
     }
 
-    // Смена пароля
     @PostMapping("/change-password")
     public String changePassword(@AuthenticationPrincipal UserDetails userDetails,
                                  @RequestParam String oldPassword,
@@ -71,23 +59,33 @@ public class ProfileController {
 
         if (!newPassword.equals(confirmPassword)) {
             model.addAttribute("error", "Пароли не совпадают");
-            return "profile/change-password";
+            model.addAttribute("content", "pages/user/profile/change-password :: content");
+            return "layouts/main";
         }
 
         if (newPassword.length() < 6) {
             model.addAttribute("error", "Пароль должен содержать минимум 6 символов");
-            return "profile/change-password";
+            model.addAttribute("content", "pages/user/profile/change-password :: content");
+            return "layouts/main";
         }
 
-        User user = userService.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        User user = getUserFromDetails(userDetails);
 
         try {
             userService.changePassword(user.getId(), oldPassword, newPassword);
             return "redirect:/profile?password-changed";
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            return "profile/change-password";
+            model.addAttribute("content", "pages/user/profile/change-password :: content");
+            return "layouts/main";
         }
+    }
+
+    private User getUserFromDetails(UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new RuntimeException("Пользователь не авторизован");
+        }
+        return userService.getUserByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
     }
 }

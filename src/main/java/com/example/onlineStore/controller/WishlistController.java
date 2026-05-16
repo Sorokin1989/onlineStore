@@ -28,15 +28,9 @@ public class WishlistController {
     private final UserService userService;
     private final ProductMapper productMapper;
 
-    // Избранное пользователя
     @GetMapping
     public String wishlist(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-
-        User user = userService.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        User user = getUserFromDetails(userDetails);
 
         List<Favorite> favorites = favoriteService.getFavoritesByUser(user);
         List<Product> products = favorites.stream()
@@ -45,42 +39,35 @@ public class WishlistController {
 
         model.addAttribute("products", productMapper.toDtoList(products));
         model.addAttribute("count", favorites.size());
+        model.addAttribute("content", "pages/user/wishlist/index :: content");
 
-        return "wishlist/index";
+        return "layouts/main";
     }
 
-    // Добавить в избранное
     @PostMapping("/add/{productId}")
     public String addToWishlist(@PathVariable Long productId,
                                 @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-
-        User user = userService.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        User user = getUserFromDetails(userDetails);
         Product product = productService.getProductById(productId)
                 .orElseThrow(() -> new RuntimeException("Товар не найден"));
 
         favoriteService.addToFavorites(user, product);
-
         return "redirect:/wishlist";
     }
 
-    // Удалить из избранного
     @PostMapping("/remove/{productId}")
     public String removeFromWishlist(@PathVariable Long productId,
                                      @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-
-        User user = userService.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        User user = getUserFromDetails(userDetails);
         favoriteService.removeFromFavorites(user, productId);
-
         return "redirect:/wishlist";
+    }
+
+    private User getUserFromDetails(UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new RuntimeException("Пользователь не авторизован");
+        }
+        return userService.getUserByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
     }
 }

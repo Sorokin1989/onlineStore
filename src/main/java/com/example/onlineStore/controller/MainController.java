@@ -28,46 +28,41 @@ public class MainController {
     private final CategoryMapper categoryMapper;
     private final ProductMapper productMapper;
 
-    // Главная страница
     @GetMapping("/")
     public String home(Model model) {
-        // Корневые категории для меню
         List<Category> rootCategories = categoryService.getRootCategories();
         List<CategoryDto> categoryDtos = categoryMapper.toDtoList(rootCategories);
 
-        // Новинки (первые 8)
         List<Product> newProducts = productService.getNewestProducts(8);
         List<ProductDto> newProductDtos = productMapper.toDtoList(newProducts);
 
-        // Товары со скидкой (первые 8)
         List<Product> discountedProducts = productService.getDiscountedProducts(8);
         List<ProductDto> discountedProductDtos = productMapper.toDtoList(discountedProducts);
 
         model.addAttribute("categories", categoryDtos);
         model.addAttribute("newProducts", newProductDtos);
         model.addAttribute("discountedProducts", discountedProductDtos);
+        model.addAttribute("content", "pages/user/home/index :: content");
 
-        return "index";
+        return "layouts/main";
     }
 
-    // Каталог с фильтрацией и пагинацией
     @GetMapping("/catalog")
     public String catalog(ProductFilterDto filter, Model model) {
         Page<Product> productPage = productService.searchProducts(filter);
         Page<ProductDto> productDtos = productPage.map(productMapper::toDto);
 
-        // Категории для фильтра
         List<Category> allCategories = categoryService.getAllCategories();
         List<CategoryDto> categoryDtos = categoryMapper.toDtoList(allCategories);
 
         model.addAttribute("products", productDtos);
         model.addAttribute("categories", categoryDtos);
         model.addAttribute("filter", filter);
+        model.addAttribute("content", "pages/user/catalog/catalog :: content");
 
-        return "catalog/list";
+        return "layouts/main";
     }
 
-    // Категория товаров
     @GetMapping("/catalog/{slug}")
     public String category(@PathVariable String slug, ProductFilterDto filter, Model model) {
         Category category = categoryService.getCategoryBySlug(slug)
@@ -77,10 +72,7 @@ public class MainController {
         Page<Product> productPage = productService.searchProducts(filter);
         Page<ProductDto> productDtos = productPage.map(productMapper::toDto);
 
-        // Подкатегории
         List<CategoryDto> subCategories = categoryMapper.toDtoList(category.getChildren());
-
-        // Хлебные крошки
         List<Category> breadcrumbs = getBreadcrumbs(category);
 
         model.addAttribute("currentCategory", categoryMapper.toDto(category));
@@ -88,11 +80,11 @@ public class MainController {
         model.addAttribute("products", productDtos);
         model.addAttribute("breadcrumbs", breadcrumbs);
         model.addAttribute("filter", filter);
+        model.addAttribute("content", "pages/user/catalog/catalog :: content");
 
-        return "catalog/list";
+        return "layouts/main";
     }
 
-    // Карточка товара
     @GetMapping("/product/{slug}")
     public String product(@PathVariable String slug, Model model) {
         Product product = productService.getProductBySlug(slug)
@@ -100,7 +92,6 @@ public class MainController {
 
         ProductDto productDto = productMapper.toDto(product);
 
-        // Похожие товары (из той же категории)
         List<Product> relatedProducts = productService.getProductsByCategory(product.getCategory());
         List<ProductDto> relatedProductDtos = relatedProducts.stream()
                 .filter(p -> !p.getId().equals(product.getId()))
@@ -110,13 +101,13 @@ public class MainController {
 
         model.addAttribute("product", productDto);
         model.addAttribute("relatedProducts", relatedProductDtos);
+        model.addAttribute("content", "pages/user/catalog/product :: content");
 
-        return "catalog/product";
+        return "layouts/main";
     }
 
-    // Поиск
     @GetMapping("/search")
-    public String search(@RequestParam String query, Model model) {
+    public String search(@RequestParam(value = "query", required = false) String query, Model model) {
         ProductFilterDto filter = new ProductFilterDto();
         filter.setQuery(query);
         Page<Product> productPage = productService.searchProducts(filter);
@@ -124,11 +115,11 @@ public class MainController {
 
         model.addAttribute("products", productDtos);
         model.addAttribute("searchQuery", query);
+        model.addAttribute("content", "pages/user/catalog/search :: content");
 
-        return "catalog/search";
+        return "layouts/main";
     }
 
-    // Хлебные крошки
     private List<Category> getBreadcrumbs(Category category) {
         List<Category> breadcrumbs = new ArrayList<>();
         Category current = category;

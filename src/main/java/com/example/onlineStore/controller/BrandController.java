@@ -34,7 +34,8 @@ public class BrandController {
     public String allBrands(Model model) {
         List<Brand> brands = brandService.getActiveBrands();
         model.addAttribute("brands", brandMapper.toDtoList(brands));
-        return "brands/list";
+        model.addAttribute("content", "pages/user/brands/list :: content");
+        return "layouts/main";
     }
 
     // Товары бренда
@@ -50,7 +51,8 @@ public class BrandController {
         model.addAttribute("brand", brandMapper.toDto(brand));
         model.addAttribute("products", productDtos);
         model.addAttribute("filter", filter);
+        model.addAttribute("content", "pages/brands/products :: content");
 
-        return "brands/products";
+        return "layouts/main";
     }
 }

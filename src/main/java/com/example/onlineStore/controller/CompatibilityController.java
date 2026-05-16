@@ -34,7 +34,8 @@ public class CompatibilityController {
     public String allCompatibilities(Model model) {
         List<Compatibility> compatibilities = compatibilityService.getActiveCompatibilities();
         model.addAttribute("compatibilities", compatibilityMapper.toDtoList(compatibilities));
-        return "compatible/list";
+        model.addAttribute("content", "pages/user/compatible/list :: content");
+        return "layouts/main";
     }
 
     // Товары, совместимые с устройством
@@ -50,7 +51,8 @@ public class CompatibilityController {
         model.addAttribute("compatibility", compatibilityMapper.toDto(compatibility));
         model.addAttribute("products", productDtos);
         model.addAttribute("filter", filter);
+        model.addAttribute("content", "pages/user/compatible/products :: content");
 
-        return "compatible/products";
+        return "layouts/main";
     }
 }

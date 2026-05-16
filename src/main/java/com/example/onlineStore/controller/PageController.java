@@ -14,37 +14,29 @@ public class PageController {
 
     private final PageService pageService;
 
-    // Статическая страница (о нас, доставка, контакты)
     @GetMapping("/page/{slug}")
     public String page(@PathVariable String slug, Model model) {
         Page page = pageService.getPageBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Страница не найдена"));
 
         model.addAttribute("page", page);
-        return "page";
+        model.addAttribute("content", "pages/user/page/page :: content");
+        return "layouts/main";
     }
 
-    // Контакты (если отдельно)
-    @GetMapping("/contacts")
-    public String contacts() {
-        return "contacts";
-    }
-
-    // О нас
     @GetMapping("/about")
     public String about(Model model) {
-        Page page = pageService.getPageBySlug("about")
-                .orElse(null);
+        Page page = pageService.getPageBySlug("about").orElse(null);
         model.addAttribute("page", page);
-        return "page";
+        model.addAttribute("content", "pages/user/page/about :: content");
+        return "layouts/main";
     }
 
-    // Доставка и оплата
     @GetMapping("/delivery")
     public String delivery(Model model) {
-        Page page = pageService.getPageBySlug("delivery")
-                .orElse(null);
+        Page page = pageService.getPageBySlug("delivery").orElse(null);
         model.addAttribute("page", page);
-        return "page";
+        model.addAttribute("content", "pages/user/page/delivery :: content");
+        return "layouts/main";
     }
 }
