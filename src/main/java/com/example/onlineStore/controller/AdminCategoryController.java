@@ -25,7 +25,8 @@ public class AdminCategoryController {
     @GetMapping
     public String listCategories(Model model) {
         model.addAttribute("categories", categoryMapper.toDtoList(categoryService.getAllCategories()));
-        return "admin/categories/list";
+        model.addAttribute("content", "pages/admin/categories/list");
+        return "layouts/main";
     }
 
     // Форма создания категории
@@ -33,15 +34,26 @@ public class AdminCategoryController {
     public String createForm(Model model) {
         model.addAttribute("category", new CategoryDto());
         model.addAttribute("parentCategories", categoryService.getRootCategories());
-        return "admin/categories/form";
+        model.addAttribute("content", "pages/admin/categories/form");
+        return "layouts/main";
     }
 
     // Сохранение категории
     @PostMapping("/create")
     public String createCategory(@ModelAttribute CategoryDto categoryDto,
                                  @RequestParam(required = false) MultipartFile image,
-                                 RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes,
+                                 Model model) {
         try {
+            // Валидация
+            if (categoryDto.getName() == null || categoryDto.getName().trim().isEmpty()) {
+                model.addAttribute("error", "Название категории обязательно");
+                model.addAttribute("category", categoryDto);
+                model.addAttribute("parentCategories", categoryService.getRootCategories());
+                model.addAttribute("content", "pages/admin/categories/form");
+                return "layouts/main";
+            }
+
             if (image != null && !image.isEmpty()) {
                 String imagePath = fileStorageService.saveFile(image, "categories");
                 categoryDto.setImagePath(imagePath);
@@ -55,10 +67,12 @@ public class AdminCategoryController {
             categoryService.createCategory(category);
 
             redirectAttributes.addFlashAttribute("success", "Категория создана");
+            return "redirect:/admin/categories";
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Ошибка при создании категории");
+            redirectAttributes.addFlashAttribute("error", "Ошибка при создании категории: " + e.getMessage());
+            return "redirect:/admin/categories/create";
         }
-        return "redirect:/admin/categories";
     }
 
     // Форма редактирования категории
@@ -69,7 +83,8 @@ public class AdminCategoryController {
 
         model.addAttribute("category", categoryMapper.toDto(category));
         model.addAttribute("parentCategories", categoryService.getRootCategories());
-        return "admin/categories/form";
+        model.addAttribute("content", "pages/admin/categories/form");
+        return "layouts/main";
     }
 
     // Обновление категории
@@ -77,8 +92,18 @@ public class AdminCategoryController {
     public String updateCategory(@PathVariable Long id,
                                  @ModelAttribute CategoryDto categoryDto,
                                  @RequestParam(required = false) MultipartFile image,
-                                 RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes,
+                                 Model model) {
         try {
+            // Валидация
+            if (categoryDto.getName() == null || categoryDto.getName().trim().isEmpty()) {
+                model.addAttribute("error", "Название категории обязательно");
+                model.addAttribute("category", categoryDto);
+                model.addAttribute("parentCategories", categoryService.getRootCategories());
+                model.addAttribute("content", "pages/admin/categories/form");
+                return "layouts/main";
+            }
+
             if (image != null && !image.isEmpty()) {
                 String imagePath = fileStorageService.saveFile(image, "categories");
                 categoryDto.setImagePath(imagePath);
@@ -92,10 +117,12 @@ public class AdminCategoryController {
             categoryService.updateCategory(id, category);
 
             redirectAttributes.addFlashAttribute("success", "Категория обновлена");
+            return "redirect:/admin/categories";
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Ошибка при обновлении категории");
+            redirectAttributes.addFlashAttribute("error", "Ошибка при обновлении категории: " + e.getMessage());
+            return "redirect:/admin/categories/edit/" + id;
         }
-        return "redirect:/admin/categories";
     }
 
     // Удаление категории
@@ -105,7 +132,7 @@ public class AdminCategoryController {
             categoryService.deleteCategory(id);
             redirectAttributes.addFlashAttribute("success", "Категория удалена");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Ошибка при удалении категории");
+            redirectAttributes.addFlashAttribute("error", "Ошибка при удалении категории: " + e.getMessage());
         }
         return "redirect:/admin/categories";
     }

@@ -23,7 +23,7 @@ public class AdminOrderController {
     public String listOrders(@RequestParam(required = false) String status, Model model) {
         java.util.List<Order> orders;
         if (status != null && !status.isEmpty()) {
-            orders = orderService.getOrdersByStatus(status);
+            orders = orderService.getOrdersByStatus(OrderStatus.valueOf(status));
             model.addAttribute("currentStatus", status);
         } else {
             orders = orderService.getAllOrders();
@@ -31,7 +31,8 @@ public class AdminOrderController {
 
         model.addAttribute("orders", orderMapper.toDtoList(orders));
         model.addAttribute("statuses", OrderStatus.values());
-        return "admin/orders/list";
+        model.addAttribute("content", "pages/admin/orders/list");
+        return "layouts/main";  // ← возвращаем layouts/main
     }
 
     // Детали заказа
@@ -42,7 +43,8 @@ public class AdminOrderController {
 
         model.addAttribute("order", orderMapper.toDto(order));
         model.addAttribute("statuses", OrderStatus.values());
-        return "admin/orders/details";
+        model.addAttribute("content", "pages/admin/orders/details");
+        return "layouts/main";  // ← возвращаем layouts/main
     }
 
     // Обновление статуса заказа

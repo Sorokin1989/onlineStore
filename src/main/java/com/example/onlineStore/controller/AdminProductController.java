@@ -4,6 +4,7 @@ import com.example.onlineStore.dto.ProductDto;
 import com.example.onlineStore.entity.Brand;
 import com.example.onlineStore.entity.Category;
 import com.example.onlineStore.entity.Product;
+import com.example.onlineStore.entity.Warranty;
 import com.example.onlineStore.mapper.ProductMapper;
 import com.example.onlineStore.service.*;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +26,15 @@ public class AdminProductController {
     private final BrandService brandService;
     private final ProductMapper productMapper;
     private final FileStorageService fileStorageService;
+    private final WarrantyService warrantyService;
 
     // Список товаров
     @GetMapping
     public String listProducts(Model model) {
         List<Product> products = productService.getAllProducts();
         model.addAttribute("products", productMapper.toDtoList(products));
-        return "admin/products/list";
+        model.addAttribute("content", "pages/admin/products/list");
+        return "layouts/main";
     }
 
     // Форма создания товара
@@ -40,35 +43,126 @@ public class AdminProductController {
         model.addAttribute("product", new ProductDto());
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("brands", brandService.getAllBrands());
-        return "admin/products/form";
+        model.addAttribute("content", "pages/admin/products/form");
+        return "layouts/main";
     }
 
     // Сохранение товара
     @PostMapping("/create")
     public String createProduct(@ModelAttribute ProductDto productDto,
-                                @RequestParam(required = false) MultipartFile mainImage,
-                                RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes,
+                                Model model) {
         try {
+            // Проверка обязательных полей
+            if (productDto.getCategoryId() == null) {
+                model.addAttribute("error", "Категория не выбрана");
+                model.addAttribute("product", productDto);  // ← возвращаем заполненные данные
+                model.addAttribute("categories", categoryService.getAllCategories());
+                model.addAttribute("brands", brandService.getAllBrands());
+                model.addAttribute("content", "pages/admin/products/form");
+                return "layouts/main";
+            }
+
+            if (productDto.getBrandId() == null) {
+                model.addAttribute("error", "Бренд не выбран");
+                model.addAttribute("product", productDto);
+                model.addAttribute("categories", categoryService.getAllCategories());
+                model.addAttribute("brands", brandService.getAllBrands());
+                model.addAttribute("content", "pages/admin/products/form");
+                return "layouts/main";
+            }
+
+            if (productDto.getName() == null || productDto.getName().trim().isEmpty()) {
+                model.addAttribute("error", "Название товара обязательно");
+                model.addAttribute("product", productDto);
+                model.addAttribute("categories", categoryService.getAllCategories());
+                model.addAttribute("brands", brandService.getAllBrands());
+                model.addAttribute("content", "pages/admin/products/form");
+                return "layouts/main";
+            }
+
+            MultipartFile mainImage = productDto.getMainImageFile();
+
+            if (mainImage != null && !mainImage.isEmpty()) {
+                String imagePath = fileStorageService.saveFile(mainImage, "products");
+                productDto.setImagePath(imagePath);
+            }
+
+            productDto.setId(null);
+
+            Category category = categoryService.getCategoryById(productDto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Категория не найдена"));
+            Brand brand = brandService.getBrandById(productDto.getBrandId())
+                    .orElseThrow(() -> new RuntimeException("Бренд не найден"));
+
+            Product product = productMapper.toEntity(productDto, category, brand);
+            productService.createProduct(product);
+
+            redirectAttributes.addFlashAttribute("success", "Товар успешно создан");
+            return "redirect:/admin/products";
+
+        } catch (Exception e) {
+            // При любой ошибке возвращаем форму с заполненными данными
+            model.addAttribute("error", "Ошибка при создании товара: " + e.getMessage());
+            model.addAttribute("product", productDto);  // ← сохраняем введённые данные
+            model.addAttribute("categories", categoryService.getAllCategories());
+            model.addAttribute("brands", brandService.getAllBrands());
+            model.addAttribute("content", "pages/admin/products/form");
+            return "layouts/main";
+        }
+    }
+    // Обновление товара
+    @PostMapping("/update/{id}")
+    public String updateProduct(@PathVariable Long id,
+                                @ModelAttribute ProductDto productDto,
+                                RedirectAttributes redirectAttributes,
+                                Model model) {
+        try {
+            if (productDto.getCategoryId() == null) {
+                model.addAttribute("error", "Категория не выбрана");
+                model.addAttribute("product", productDto);
+                model.addAttribute("categories", categoryService.getAllCategories());
+                model.addAttribute("brands", brandService.getAllBrands());
+                model.addAttribute("content", "pages/admin/products/form");
+                return "layouts/main";
+            }
+
+            if (productDto.getBrandId() == null) {
+                model.addAttribute("error", "Бренд не выбран");
+                model.addAttribute("product", productDto);
+                model.addAttribute("categories", categoryService.getAllCategories());
+                model.addAttribute("brands", brandService.getAllBrands());
+                model.addAttribute("content", "pages/admin/products/form");
+                return "layouts/main";
+            }
+
+            MultipartFile mainImage = productDto.getMainImageFile();
+
             if (mainImage != null && !mainImage.isEmpty()) {
                 String imagePath = fileStorageService.saveFile(mainImage, "products");
                 productDto.setImagePath(imagePath);
             }
 
             Category category = categoryService.getCategoryById(productDto.getCategoryId())
-                    .orElse(null);
+                    .orElseThrow(() -> new RuntimeException("Категория не найдена"));
             Brand brand = brandService.getBrandById(productDto.getBrandId())
-                    .orElse(null);
+                    .orElseThrow(() -> new RuntimeException("Бренд не найден"));
 
             Product product = productMapper.toEntity(productDto, category, brand);
-            productService.createProduct(product);
+            productService.updateProduct(id, product);
 
-            redirectAttributes.addFlashAttribute("success", "Товар успешно создан");
+            redirectAttributes.addFlashAttribute("success", "Товар успешно обновлён");
+            return "redirect:/admin/products";
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Ошибка при создании товара: " + e.getMessage());
+            model.addAttribute("error", "Ошибка при обновлении товара: " + e.getMessage());
+            model.addAttribute("product", productDto);
+            model.addAttribute("categories", categoryService.getAllCategories());
+            model.addAttribute("brands", brandService.getAllBrands());
+            model.addAttribute("content", "pages/admin/products/form");
+            return "layouts/main";
         }
-        return "redirect:/admin/products";
     }
-
     // Форма редактирования товара
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
@@ -78,34 +172,8 @@ public class AdminProductController {
         model.addAttribute("product", productMapper.toDto(product));
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("brands", brandService.getAllBrands());
-        return "admin/products/form";
-    }
-
-    // Обновление товара
-    @PostMapping("/update/{id}")
-    public String updateProduct(@PathVariable Long id,
-                                @ModelAttribute ProductDto productDto,
-                                @RequestParam(required = false) MultipartFile mainImage,
-                                RedirectAttributes redirectAttributes) {
-        try {
-            if (mainImage != null && !mainImage.isEmpty()) {
-                String imagePath = fileStorageService.saveFile(mainImage, "products");
-                productDto.setImagePath(imagePath);
-            }
-
-            Category category = categoryService.getCategoryById(productDto.getCategoryId())
-                    .orElse(null);
-            Brand brand = brandService.getBrandById(productDto.getBrandId())
-                    .orElse(null);
-
-            Product product = productMapper.toEntity(productDto, category, brand);
-            productService.updateProduct(id, product);
-
-            redirectAttributes.addFlashAttribute("success", "Товар успешно обновлён");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Ошибка при обновлении товара: " + e.getMessage());
-        }
-        return "redirect:/admin/products";
+        model.addAttribute("content", "pages/admin/products/form");
+        return "layouts/main";
     }
 
     // Удаление товара
@@ -128,7 +196,8 @@ public class AdminProductController {
 
         model.addAttribute("product", product);
         model.addAttribute("images", product.getImages());
-        return "admin/products/images";
+        model.addAttribute("content", "pages/admin/products/images");
+        return "layouts/main";
     }
 
     @PostMapping("/images/{productId}/upload")

@@ -1,5 +1,6 @@
-package com.example.onlineStore.controller.admin;
+package com.example.onlineStore.controller;
 
+import com.example.onlineStore.enums.OrderStatus;
 import com.example.onlineStore.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -25,8 +26,14 @@ public class AdminController {
         model.addAttribute("totalOrders", orderService.getAllOrders().size());
         model.addAttribute("totalUsers", userService.getAllUsers().size());
         model.addAttribute("pendingReviews", reviewService.getPendingReviews().size());
-        model.addAttribute("newOrders", orderService.getOrdersByStatus("NEW").size());
+        model.addAttribute("newOrders", orderService.getOrdersByStatus(OrderStatus.NEW).size()); // Исправлено: OrderStatus.NEW
 
-        return "admin/index";
+        // Добавляем settings для совместимости с layout
+        model.addAttribute("settings", new Object());
+
+        // ИСПРАВЛЕНО: указываем на правильный фрагмент дашборда
+        model.addAttribute("content", "pages/admin/dashboard :: content");
+
+        return "layouts/main";
     }
 }
